@@ -153,6 +153,8 @@ word Tokenizer::readNextWord() {
 	token.value = "";
 	token.type = -1;
 
+	int temp_pos;
+
 	if(has_read_pound) { //如果已经读取到了 '#'
 		token.type = -1;
 		return token;
@@ -209,6 +211,7 @@ word Tokenizer::readNextWord() {
 		token.type = 21;
 	} else if(ch == '/') { // / or /* or //
 		token.value += ch;
+		temp_pos = text_count - 1;
 
 		if(hasLineEnd()) { //读到了某一行的结束
 			token.type = 13; //即为除号
@@ -249,6 +252,7 @@ word Tokenizer::readNextWord() {
 		}
 	} else if(ch == '*') { // * or */
 		token.value += ch;
+		temp_pos = text_count - 1;
 
 		if(hasLineEnd()) { //读到了某一行的结束
 			token.type = 12; //即为乘号
@@ -379,9 +383,13 @@ word Tokenizer::readNextWord() {
 		else { token.type = 7; }
 	}
 
-	
-	token.end_char_num = text_count - 1;
-	token.start_char_num = token.end_char_num - token.value.length() + 1;
+	if(token.type >= 26 && token.type <= 28) {
+		token.start_char_num = temp_pos;
+		token.end_char_num = temp_pos + 1;
+	} else {
+		token.end_char_num = text_count - 1;
+		token.start_char_num = token.end_char_num - token.value.length() + 1;
+	}
 
 	return token;
 }
